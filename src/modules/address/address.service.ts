@@ -1,18 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../../firebase/firebase.service';
 import { AddressDto } from './dtos/address.dto';
-import { CreateAddressDto } from './dtos/create-address.dto';
 
 @Injectable()
 export class AddressService {
   constructor(private readonly firebaseService: FirebaseService) {}
 
-  async createAddress(addressData: CreateAddressDto): Promise<AddressDto> {
+  async createAddress(addressData: AddressDto): Promise<AddressDto> {
     try {
       const addressId = this.firebaseService.db.collection('addresses').doc().id;
       
       const newAddress: AddressDto = {
-        id: addressId,
         ...addressData,
       };
       

@@ -26,6 +26,7 @@ export class RestaurantsService {
   }
   
   async getRestaurantById(id: string): Promise<Restaurante> {
+    console.log({id});
     const restaurantDoc = await this.firebaseService.db.collection('restaurantes').doc(id).get();
     if (!restaurantDoc.exists) {
       throw new Error('Restaurante não encontrado');
