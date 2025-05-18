@@ -34,6 +34,15 @@ export class RestaurantsService {
     return restaurantDoc.data() as Restaurante;
   }
   
+  async getRestaurantsByUserId(userId: string): Promise<Restaurante[]> {
+    const restaurantsSnapshot = await this.firebaseService.db
+      .collection('restaurantes')
+      .where('userId', '==', userId)
+      .get();
+    
+    return restaurantsSnapshot.docs.map(doc => doc.data() as Restaurante);
+  }
+  
   async getAllRestaurants(): Promise<Restaurante[]> {
     const restaurantsSnapshot = await this.firebaseService.db.collection('restaurantes').get();
     return restaurantsSnapshot.docs.map(doc => doc.data() as Restaurante);

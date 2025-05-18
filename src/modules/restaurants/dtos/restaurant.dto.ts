@@ -56,4 +56,8 @@ export class RestaurantDto {
   @Type(() => LocalizacaoDto)
   @IsNotEmpty()
   location: LocalizacaoDto;
+
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
 } 

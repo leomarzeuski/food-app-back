@@ -17,6 +17,11 @@ export class RestaurantsController {
     return this.restaurantsService.getAllRestaurants();
   }
   
+  @Get('user/:userId')
+  async getRestaurantsByUserId(@Param('userId') userId: string): Promise<Restaurante[]> {
+    return this.restaurantsService.getRestaurantsByUserId(userId);
+  }
+  
   @Get(':id')
   async getRestaurantById(@Param('id') id: string): Promise<Restaurante> {
     return this.restaurantsService.getRestaurantById(id);
