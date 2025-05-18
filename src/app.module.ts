@@ -11,7 +11,7 @@ import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     FirebaseModule,
     UserModule,
     RestaurantsModule,
