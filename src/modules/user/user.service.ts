@@ -1,8 +1,8 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { FirebaseService } from '../../firebase/firebase.service';
-import { UserDto } from './dtos/user.dto';
+import { CreateAddressDto, UserDto } from './dtos/user.dto';
 import * as bcrypt from 'bcrypt';
-import { User } from 'src/interfaces/user';
+import { Address, User } from 'src/interfaces/user';
 
 @Injectable()
 export class UserService {
@@ -81,5 +81,97 @@ export class UserService {
   
   async deleteUser(id: string): Promise<void> {
     await this.firebaseService.db.collection('usuarios').doc(id).delete();
+  }
+
+  async addAddress(userId: string, addressData: CreateAddressDto): Promise<Omit<User, 'senha'>> {
+    const userDoc = await this.firebaseService.db.collection('usuarios').doc(userId).get();
+    
+    if (!userDoc.exists) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    
+    const user = userDoc.data() as User;
+    
+    const addressId = this.firebaseService.db.collection('temp').doc().id;
+    
+    const newAddress: Address = {
+      id: addressId,
+      ...addressData
+    };
+    
+    const enderecos = user.enderecos || [];
+    enderecos.push(newAddress);
+    
+    await this.firebaseService.db.collection('usuarios').doc(userId).update({
+      enderecos: enderecos
+    });
+    
+    return this.getUserById(userId);
+  }
+
+  async getUserAddresses(userId: string): Promise<Address[]> {
+    const userDoc = await this.firebaseService.db.collection('usuarios').doc(userId).get();
+    
+    if (!userDoc.exists) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    
+    const user = userDoc.data() as User;
+    return user.enderecos || [];
+  }
+
+  async updateAddress(
+    userId: string, 
+    addressId: string, 
+    addressData: Partial<CreateAddressDto>
+  ): Promise<Omit<User, 'senha'>> {
+    const userDoc = await this.firebaseService.db.collection('usuarios').doc(userId).get();
+    
+    if (!userDoc.exists) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    
+    const user = userDoc.data() as User;
+    const enderecos = user.enderecos || [];
+    
+    const addressIndex = enderecos.findIndex(addr => addr.id === addressId);
+    
+    if (addressIndex === -1) {
+      throw new NotFoundException('Endereço não encontrado');
+    }
+    
+    enderecos[addressIndex] = {
+      ...enderecos[addressIndex],
+      ...addressData
+    };
+    
+    await this.firebaseService.db.collection('usuarios').doc(userId).update({
+      enderecos: enderecos
+    });
+    
+    return this.getUserById(userId);
+  }
+
+  async deleteAddress(userId: string, addressId: string): Promise<Omit<User, 'senha'>> {
+    const userDoc = await this.firebaseService.db.collection('usuarios').doc(userId).get();
+    
+    if (!userDoc.exists) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+    
+    const user = userDoc.data() as User;
+    const enderecos = user.enderecos || [];
+    
+    const updatedAddresses = enderecos.filter(addr => addr.id !== addressId);
+    
+    if (updatedAddresses.length === enderecos.length) {
+      throw new NotFoundException('Endereço não encontrado');
+    }
+    
+    await this.firebaseService.db.collection('usuarios').doc(userId).update({
+      enderecos: updatedAddresses
+    });
+    
+    return this.getUserById(userId);
   }
 }
