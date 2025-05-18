@@ -4,4 +4,5 @@ export interface User {
     email: string;
     tipo: 'cliente' | 'entregador';
     createdAt: string;
-  }
+    senha: string; 
+}

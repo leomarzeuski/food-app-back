@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsEnum } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, IsEnum, MinLength } from 'class-validator';
 
 export class UserDto {
   @IsString()
@@ -8,6 +8,11 @@ export class UserDto {
   @IsEmail()
   @IsNotEmpty()
   email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6, { message: 'A senha deve ter pelo menos 6 caracteres' })
+  senha: string;
 
   @IsEnum(['cliente', 'entregador'], { message: 'Tipo deve ser cliente ou entregador' })
   @IsNotEmpty()
