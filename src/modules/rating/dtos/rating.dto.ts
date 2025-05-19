@@ -18,4 +18,8 @@ export class RatingDto {
   @IsString()
   @IsOptional()
   comentario: string;
+
+  @IsString()
+  @IsNotEmpty()
+  restaurantId: string;
 } 

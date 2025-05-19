@@ -19,4 +19,6 @@ export interface Localizacao {
     isOpen: boolean;
     location: Localizacao;
     createdAt: string;
+    userId: string;
+    ratingAverage: number;
   }

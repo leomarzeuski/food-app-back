@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, ValidationPipe } from '@nestjs/common';
+// src/modules/address/address.controller.ts
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, ValidationPipe } from '@nestjs/common';
 import { AddressService } from './address.service';
 import { AddressDto } from './dtos/address.dto';
 
@@ -7,12 +8,18 @@ export class AddressController {
   constructor(private readonly addressService: AddressService) {}
 
   @Post()
-  async createAddress(@Body(ValidationPipe) createAddressDto: AddressDto): Promise<AddressDto> {
-    return this.addressService.createAddress(createAddressDto);
+  async createAddress(@Body(ValidationPipe) addressData: AddressDto): Promise<AddressDto> {
+    return this.addressService.createAddress(addressData);
   }
   
   @Get()
-  async getAllAddresses(): Promise<AddressDto[]> {
+  async getAddresses(
+    @Query('entityId') entityId?: string,
+    @Query('entityType') entityType?: 'user' | 'restaurant',
+  ): Promise<AddressDto[]> {
+    if (entityId && entityType) {
+      return this.addressService.getAddressesByEntityId(entityId, entityType);
+    }
     return this.addressService.getAllAddresses();
   }
   
@@ -21,13 +28,11 @@ export class AddressController {
     return this.addressService.getAddressById(id);
   }
   
-  @Get('user/:userId')
-  async getAddressesByUser(@Param('userId') userId: string): Promise<AddressDto[]> {
-    return this.addressService.getAddressesByUser(userId);
-  }
-  
   @Put(':id')
-  async updateAddress(@Param('id') id: string, @Body() addressData: Partial<AddressDto>): Promise<AddressDto> {
+  async updateAddress(
+    @Param('id') id: string,
+    @Body() addressData: Partial<AddressDto>,
+  ): Promise<AddressDto> {
     return this.addressService.updateAddress(id, addressData);
   }
   
@@ -35,4 +40,13 @@ export class AddressController {
   async deleteAddress(@Param('id') id: string): Promise<void> {
     return this.addressService.deleteAddress(id);
   }
-} 
+  
+  @Put(':id/primary')
+  async setAddressAsPrimary(
+    @Param('id') id: string,
+    @Body('entityId') entityId: string,
+    @Body('entityType') entityType: 'user' | 'restaurant',
+  ): Promise<void> {
+    return this.addressService.setAddressAsPrimary(id, entityId, entityType);
+  }
+}

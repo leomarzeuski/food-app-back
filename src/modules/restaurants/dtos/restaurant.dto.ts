@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsArray, IsBoolean, ValidateNested, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, IsBoolean, ValidateNested, IsNumber, IsOptional } from 'class-validator';
 import { Type } from 'class-transformer';
 import { Endereco, Localizacao } from '../../../interfaces/restaurants';
 
@@ -56,4 +56,12 @@ export class RestaurantDto {
   @Type(() => LocalizacaoDto)
   @IsNotEmpty()
   location: LocalizacaoDto;
+
+  @IsString()
+  @IsNotEmpty()
+  userId: string;
+
+  @IsString()
+  @IsOptional()
+  ratingAverage: number;
 } 

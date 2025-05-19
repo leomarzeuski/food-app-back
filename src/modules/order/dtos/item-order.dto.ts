@@ -6,6 +6,10 @@ export class ItemOrderDto {
   @IsNotEmpty()
   itemId: string;
 
+  @IsString()
+  @IsNotEmpty()
+  itemName: string;
+
   @IsNumber()
   @IsNotEmpty()
   @Min(1)
@@ -21,6 +25,10 @@ export class CreateOrderDto {
   @IsString()
   @IsNotEmpty()
   userId: string;
+
+  @IsString()
+  @IsNotEmpty()
+  userName: string;
 
   @IsString()
   @IsNotEmpty()
