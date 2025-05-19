@@ -43,10 +43,33 @@ export class RestaurantsService {
     return restaurantsSnapshot.docs.map(doc => doc.data() as Restaurante);
   }
   
-  async getAllRestaurants(): Promise<Restaurante[]> {
-    const restaurantsSnapshot = await this.firebaseService.db.collection('restaurantes').get();
-    return restaurantsSnapshot.docs.map(doc => doc.data() as Restaurante);
-  }
+async getAllRestaurants(): Promise<Restaurante[]> {
+  const restaurantsSnapshot = await this.firebaseService.db.collection('restaurantes').get();
+  const restaurants = restaurantsSnapshot.docs.map(doc => {
+    return {
+      id: doc.id,
+      ...doc.data()
+    } as Restaurante;
+  });
+  
+  const ratingsSnapshot = await this.firebaseService.db.collection('ratings').get();
+  const ratings = ratingsSnapshot.docs.map(doc => doc.data());
+  
+  return restaurants.map(restaurant => {
+    const restaurantRatings = ratings.filter(rating => rating.restaurantId === restaurant.id);
+    
+    let ratingAverage = 0;
+    if (restaurantRatings.length > 0) {
+      const sum = restaurantRatings.reduce((total, rating) => total + rating.nota, 0);
+      ratingAverage = Number((sum / restaurantRatings.length).toFixed(2));
+    }
+    
+    return {
+      ...restaurant,
+      ratingAverage
+    };
+  });
+}
   
   async updateRestaurant(id: string, restaurantData: Partial<Restaurante>): Promise<Restaurante> {
     await this.firebaseService.db.collection('restaurantes').doc(id).update(restaurantData);

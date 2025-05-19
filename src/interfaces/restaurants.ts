@@ -20,4 +20,5 @@ export interface Localizacao {
     location: Localizacao;
     createdAt: string;
     userId: string;
+    ratingAverage: number;
   }
